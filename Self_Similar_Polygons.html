@@ -1,0 +1,73 @@
+    <script src="https://cdn.jsdelivr.net/npm/p5@1.1.9/lib/p5.js"></script>
+    <script src="sketch.js"></script>
+    <script>
+
+// A rotating self similar recursive construction of polygons like russian dolls
+// For a n-sized-polygon, we place n times the same polygon inside it equally distributed
+// We rotate each polygon depending on time
+
+
+// // // // // // // 
+// // Variables // //
+// // // // // // // 
+
+var iterations = 2
+var sides = 43
+
+// // // // // // // //
+// // // // // // // //
+
+var screenSize = 900
+var angle = -Math.PI/2
+// Here we zoom as much as we want on the center of the animation
+var polygonSize = 50000
+var rotation = 0
+
+
+
+function setup() {
+  createCanvas(screenSize, screenSize);
+  background(20);
+  frameRate(10)
+}
+
+function draw() {
+  rotation+=0.0025
+  background(20);
+  // If we wanted to zoom but not on the center, we would have to change thses screenSize/2
+  SelfSimilarPolygons(screenSize/2,screenSize/2,iterations,polygonSize,sides)
+}
+
+// we can see a regular polygon as the link between the points of an equally cut cicle
+function polygon(x, y, radius, npoints) {
+  let angle = TWO_PI / npoints;
+  beginShape();
+  for (let a = 0; a < TWO_PI; a += angle) {
+    let sx = x + cos(a+rotation) * radius;
+    let sy = y + sin(a+rotation) * radius;
+    vertex(sx, sy);
+  }
+  endShape(CLOSE);
+}
+
+
+function SelfSimilarPolygons(x,y,n,taille,sideNumber){
+  if(n>0){
+    SelfSimilarPolygons(x , y  , 0 , taille,sideNumber)
+    // For each polygon, we put a new polygon at a distance of half the size of our actual polygon from the center or the actual polygon. 
+    //We repeat this in order to subdivise a circle into equal pieces and creating a poleagon on each point of this cut.
+    for (var i=0; i<sideNumber;i++){
+      SelfSimilarPolygons(x+taille*cos(angle + 2*i*Math.PI/sideNumber)/2 , y + taille*sin(angle+ 2*i*Math.PI/sideNumber)/2 , n-1 , taille/2,sideNumber)
+
+    }
+  }
+  else{
+    push()
+    noFill()
+    stroke(255,255/n,255/n-127)
+    polygon(x,y,taille,sideNumber)
+    pop()
+  }
+}
+
+</script>
